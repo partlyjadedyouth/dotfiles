@@ -1,4 +1,7 @@
 case $@ in
+"Arc")
+  icon_result=":google_chrome:"
+  ;;
 "Brave Browser")
   icon_result=":brave_browser:"
   ;;
