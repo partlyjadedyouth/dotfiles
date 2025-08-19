@@ -3,4 +3,4 @@
 	name = Joonyoung Park 
 	email = joonyoung@kaist.ac.kr
 [core]
-	excludesfile = /Users/joon/.gitignore_global
+	excludesfile = ~/.gitignore_global
