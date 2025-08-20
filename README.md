@@ -2,6 +2,9 @@
 
 Personal configuration files for a powerful macOS development environment.
 
+This code isn't my original work, it is a combination and refinement of code that others have created and shared online over the past several years. 
+Therefore, I do not hold the copyright.
+
 ## ✨ Overview
 
 This repository contains my configuration files for:
