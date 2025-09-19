@@ -1,4 +1,4 @@
-# opens warp
+# opens kitty
 alt - return : "${HOME}"/Dotfiles/yabai/scripts/open_kitty.sh
 
 # Navigation
