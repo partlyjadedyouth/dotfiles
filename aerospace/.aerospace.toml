@@ -1,0 +1,205 @@
+config-version = 2
+start-at-login = true
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+accordion-padding = 30
+
+on-focus-changed = [
+  'move-mouse window-lazy-center',
+  'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
+]
+automatically-unhide-macos-hidden-apps = false
+persistent-workspaces = ['1', '2', '3', '4', '5']
+exec-on-workspace-change = ['/bin/bash', '-c',
+  '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE PREV=$AEROSPACE_PREV_WORKSPACE'
+]
+
+after-startup-command = [
+  'exec-and-forget /bin/bash -c "/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$(aerospace list-workspaces --focused | head -n 1); /opt/homebrew/bin/sketchybar --trigger windows_on_spaces"'
+]
+
+[workspace-to-monitor-force-assignment]
+1 = 'main'
+2 = 'main'
+3 = 'main'
+4 = ['secondary', 'main']
+5 = ['secondary', 'main']
+
+[exec]
+inherit-env-vars = true
+
+[exec.env-vars]
+PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.top = [{ monitor."DELL" = 40 }, 8]
+outer.bottom = 4
+outer.left = 4
+outer.right = 4
+
+[[on-window-detected]]
+check-further-callbacks = true
+run = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^System Settings$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Finder$'
+if.window-title-regex-substring = 'Co(py|nnect)|Move|Info|Pref'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Safari$'
+if.window-title-regex-substring = '^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^macfeh$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^App Store$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Activity Monitor$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^KeePassXC$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Calculator$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Dictionary$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^mpv$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.window-title-regex-substring = '^Software Update$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^System Information$'
+if.window-title-regex-substring = '^About This Mac$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^KakaoTalk$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Music$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^음악$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Calendar$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Across$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Keka$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^AppCleaner$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^SwitchIM$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^Photo Booth$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^FaceTime$'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '^TheBoringNotch$'
+run = 'layout floating'
+
+[mode.main.binding]
+alt-enter = 'exec-and-forget open -na Ghostty'
+
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+alt-shift-cmd-h = 'swap left'
+alt-shift-cmd-j = 'swap down'
+alt-shift-cmd-k = 'swap up'
+alt-shift-cmd-l = 'swap right'
+
+alt-shift-m = 'move-node-to-monitor --focus-follows-window next'
+alt-shift-z = 'move-node-to-workspace --focus-follows-window prev'
+alt-shift-x = 'move-node-to-workspace --focus-follows-window next'
+alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
+alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
+alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'
+alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'
+alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'
+
+alt-cmd-z = 'workspace prev'
+alt-cmd-x = 'workspace next'
+alt-cmd-1 = 'workspace 1'
+alt-cmd-2 = 'workspace 2'
+alt-cmd-3 = 'workspace 3'
+alt-cmd-4 = 'workspace 4'
+alt-cmd-5 = 'workspace 5'
+
+ctrl-alt-h = 'resize width -50'
+ctrl-alt-j = 'resize height +50'
+ctrl-alt-k = 'resize height -50'
+ctrl-alt-l = 'resize width +50'
+ctrl-alt-e = 'balance-sizes'
+
+alt-r = 'flatten-workspace-tree'
+alt-shift-r = 'reload-config'
+alt-x = 'layout horizontal'
+alt-y = 'layout vertical'
+
+alt-shift-space = [
+  'layout floating tiling',
+  'exec-and-forget ~/bin/bash -c "sketchybar --trigger window_focus"'
+]
+
+ctrl-alt-shift-r = 'reload-config'
+
+alt-f = [
+  'fullscreen',
+  'exec-and-forget /bin/bash -c "sketchybar --trigger window_focus"'
+]
+alt-shift-f = 'macos-native-fullscreen'
+
+alt-comma = 'layout tiles accordion'
+alt-tab = 'workspace-back-and-forth'

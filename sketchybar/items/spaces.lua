@@ -3,11 +3,123 @@ local icons = require("icons")
 local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
+local max_spaces = 5
 local spaces = {}
+local space_brackets = {}
+local space_paddings = {}
 
-for i = 1, 10, 1 do
-  local space = sbar.add("space", "space." .. i, {
-    space = i,
+local function trim(value)
+  if value == nil then
+    return ""
+  end
+  return (value:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function build_icon_line(apps)
+  if apps == nil or #apps == 0 then
+    return " —"
+  end
+
+  local icon_line = ""
+  for _, app in ipairs(apps) do
+    local lookup = app_icons[app]
+    local icon = (lookup == nil) and app_icons["Default"] or lookup
+    icon_line = icon_line .. icon
+  end
+  return icon_line
+end
+
+local function set_focused_space(focused_workspace)
+  local focused = trim(focused_workspace)
+  if focused == "" then
+    return
+  end
+
+  for i = 1, max_spaces, 1 do
+    local selected = tostring(i) == focused
+    spaces[i]:set({
+      icon = { highlight = selected },
+      label = { highlight = selected },
+      background = { border_color = selected and colors.black or colors.bg2 }
+    })
+    space_brackets[i]:set({
+      background = { border_color = selected and colors.grey or colors.bg2 }
+    })
+  end
+end
+
+local function update_focused_space(focused_workspace)
+  local focused = trim(focused_workspace)
+  if focused ~= "" then
+    set_focused_space(focused)
+    return
+  end
+
+  sbar.exec("aerospace list-workspaces --focused 2>/dev/null | head -n 1", function(result)
+    set_focused_space(result)
+  end)
+end
+
+local function update_windows_on_spaces()
+  sbar.exec("aerospace list-windows --all --format '%{workspace}|%{app-name}' 2>/dev/null", function(result)
+    local apps_by_space = {}
+    local seen_by_space = {}
+    for i = 1, max_spaces, 1 do
+      local sid = tostring(i)
+      apps_by_space[sid] = {}
+      seen_by_space[sid] = {}
+    end
+
+    for line in string.gmatch(result, "[^\r\n]+") do
+      local workspace, app = line:match("^(.-)|(.+)$")
+      workspace = trim(workspace)
+      app = trim(app)
+      if apps_by_space[workspace] ~= nil and app ~= "" and not seen_by_space[workspace][app] then
+        table.insert(apps_by_space[workspace], app)
+        seen_by_space[workspace][app] = true
+      end
+    end
+
+    sbar.animate("tanh", 10, function()
+      for i = 1, max_spaces, 1 do
+        local sid = tostring(i)
+        spaces[i]:set({ label = build_icon_line(apps_by_space[sid]) })
+      end
+    end)
+  end)
+end
+
+local function update_space_displays()
+  sbar.exec("aerospace list-workspaces --all --format '%{workspace}|%{monitor-id}' 2>/dev/null", function(result)
+    local monitor_by_space = {}
+    for line in string.gmatch(result, "[^\r\n]+") do
+      local workspace, monitor = line:match("^(.-)|(.+)$")
+      workspace = trim(workspace)
+      monitor = trim(monitor)
+      if workspace ~= "" and monitor ~= "" then
+        monitor_by_space[workspace] = monitor
+      end
+    end
+
+    for i = 1, max_spaces, 1 do
+      local sid = tostring(i)
+      local monitor = monitor_by_space[sid]
+      if monitor ~= nil then
+        spaces[i]:set({ display = monitor })
+        space_brackets[i]:set({ display = monitor })
+        space_paddings[i]:set({ display = monitor })
+      end
+    end
+  end)
+end
+
+sbar.add("event", "aerospace_workspace_change")
+sbar.add("event", "windows_on_spaces")
+sbar.add("event", "window_focus")
+
+for i = 1, max_spaces, 1 do
+  local sid = tostring(i)
+  local space = sbar.add("item", "space." .. sid, {
     icon = {
       font = { family = settings.font.numbers },
       string = i,
@@ -31,7 +143,6 @@ for i = 1, 10, 1 do
       height = 26,
       border_color = colors.black,
     },
-    popup = { background = { border_width = 5, border_color = colors.black } }
   })
 
   spaces[i] = space
@@ -45,58 +156,39 @@ for i = 1, 10, 1 do
       border_width = 2
     }
   })
+  space_brackets[i] = space_bracket
 
   -- Padding space
-  sbar.add("space", "space.padding." .. i, {
-    space = i,
+  local space_padding = sbar.add("item", "space.padding." .. sid, {
     script = "",
     width = settings.group_paddings,
   })
-
-  local space_popup = sbar.add("item", {
-    position = "popup." .. space.name,
-    padding_left= 5,
-    padding_right= 0,
-    background = {
-      drawing = true,
-      image = {
-        corner_radius = 9,
-        scale = 0.2
-      }
-    }
-  })
-
-  space:subscribe("space_change", function(env)
-    local selected = env.SELECTED == "true"
-    local color = selected and colors.grey or colors.bg2
-    space:set({
-      icon = { highlight = selected, },
-      label = { highlight = selected },
-      background = { border_color = selected and colors.black or colors.bg2 }
-    })
-    space_bracket:set({
-      background = { border_color = selected and colors.grey or colors.bg2 }
-    })
-  end)
+  space_paddings[i] = space_padding
 
   space:subscribe("mouse.clicked", function(env)
-    if env.BUTTON == "other" then
-      space_popup:set({ background = { image = "space." .. env.SID } })
-      space:set({ popup = { drawing = "toggle" } })
+    if env.BUTTON == "right" then
+      sbar.exec("aerospace move-node-to-workspace --focus-follows-window " .. sid .. " >/dev/null 2>&1", function()
+        update_focused_space(sid)
+        update_windows_on_spaces()
+      end)
     else
-      local op = (env.BUTTON == "right") and "--destroy" or "--focus"
-      sbar.exec("yabai -m space " .. op .. " " .. env.SID)
+      sbar.exec("aerospace workspace " .. sid .. " >/dev/null 2>&1", function()
+        update_focused_space(sid)
+        update_windows_on_spaces()
+      end)
     end
   end)
-
-  space:subscribe("mouse.exited", function(_)
-    space:set({ popup = { drawing = false } })
-  end)
 end
+
+local space_focus_observer = sbar.add("item", {
+  drawing = false,
+  updates = true,
+})
 
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
+  update_freq = 5,
 })
 
 local spaces_indicator = sbar.add("item", {
@@ -121,22 +213,21 @@ local spaces_indicator = sbar.add("item", {
   }
 })
 
-space_window_observer:subscribe("space_windows_change", function(env)
-  local icon_line = ""
-  local no_app = true
-  for app, count in pairs(env.INFO.apps) do
-    no_app = false
-    local lookup = app_icons[app]
-    local icon = ((lookup == nil) and app_icons["Default"] or lookup)
-    icon_line = icon_line .. icon
-  end
+space_focus_observer:subscribe("aerospace_workspace_change", function(env)
+  update_focused_space(env and env.FOCUSED or nil)
+  update_space_displays()
+end)
 
-  if (no_app) then
-    icon_line = " —"
-  end
-  sbar.animate("tanh", 10, function()
-    spaces[env.INFO.space]:set({ label = icon_line })
-  end)
+space_window_observer:subscribe("aerospace_workspace_change", function(env)
+  update_windows_on_spaces()
+end)
+
+space_window_observer:subscribe("windows_on_spaces", update_windows_on_spaces)
+space_window_observer:subscribe("front_app_switched", update_windows_on_spaces)
+space_window_observer:subscribe("window_focus", update_windows_on_spaces)
+space_window_observer:subscribe("routine", function(env)
+  update_space_displays()
+  update_windows_on_spaces()
 end)
 
 spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
@@ -175,3 +266,7 @@ end)
 spaces_indicator:subscribe("mouse.clicked", function(env)
   sbar.trigger("swap_menus_and_spaces")
 end)
+
+update_focused_space()
+update_space_displays()
+update_windows_on_spaces()
