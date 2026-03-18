@@ -22,6 +22,8 @@ front_app:subscribe("mouse.clicked", function(env)
 end)
 
 sbar.exec(
-  "sketchybar --query spaces.indicator >/dev/null 2>&1"
+  "sketchybar --query apple.logo >/dev/null 2>&1"
+    .. " && sketchybar --move spaces.indicator after apple.logo >/dev/null 2>&1;"
+    .. " sketchybar --query spaces.indicator >/dev/null 2>&1"
     .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
 )

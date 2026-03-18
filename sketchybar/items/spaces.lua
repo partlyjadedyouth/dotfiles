@@ -7,6 +7,9 @@ local spaces = {}
 local space_brackets = {}
 local space_paddings = {}
 local workspace_order = {}
+local refresh_running = false
+local refresh_queued = false
+local queued_focused_workspace = nil
 
 local function trim(value)
   if value == nil then
@@ -27,24 +30,59 @@ local function workspace_key(workspace)
   return table.concat(bytes)
 end
 
-local function reorder_aux_items()
-  local last_workspace = workspace_order[#workspace_order]
-  if last_workspace == nil then
-    return
+local function reorder_aux_items(with_retry)
+  local move_commands = {}
+  local anchor_name = "spaces.indicator"
+
+  move_commands[#move_commands + 1] = "sketchybar --query apple.logo >/dev/null 2>&1"
+    .. " && sketchybar --move spaces.indicator after apple.logo >/dev/null 2>&1"
+
+  for _, workspace in ipairs(workspace_order) do
+    local space = spaces[workspace]
+    local padding = space_paddings[workspace]
+
+    if space ~= nil then
+      move_commands[#move_commands + 1] = "sketchybar --move "
+        .. shell_escape(space.name)
+        .. " after "
+        .. shell_escape(anchor_name)
+        .. " >/dev/null 2>&1"
+      anchor_name = space.name
+    end
+
+    if padding ~= nil then
+      move_commands[#move_commands + 1] = "sketchybar --move "
+        .. shell_escape(padding.name)
+        .. " after "
+        .. shell_escape(anchor_name)
+        .. " >/dev/null 2>&1"
+      anchor_name = padding.name
+    end
   end
 
-  local anchor_item = space_paddings[last_workspace] or spaces[last_workspace]
-  if anchor_item == nil then
-    return
+  move_commands[#move_commands + 1] = "sketchybar --query front_app >/dev/null 2>&1"
+    .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
+
+  local command = table.concat(move_commands, "; ")
+  sbar.exec(command)
+
+  if with_retry then
+    sbar.exec("sleep 0.05; " .. command)
+  end
+end
+
+local function same_workspace_order(left, right)
+  if #left ~= #right then
+    return false
   end
 
-  local anchor = shell_escape(anchor_item.name)
-  sbar.exec(
-    "sketchybar --move spaces.indicator after " .. anchor
-      .. " >/dev/null 2>&1;"
-      .. " sketchybar --query front_app >/dev/null 2>&1"
-      .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
-  )
+  for i = 1, #left, 1 do
+    if left[i] ~= right[i] then
+      return false
+    end
+  end
+
+  return true
 end
 
 local function build_icon_line(apps)
@@ -184,6 +222,7 @@ local function sync_workspaces(callback)
     local seen = {}
     local ordered = {}
     local monitor_by_workspace = {}
+    local structure_changed = false
 
     for line in string.gmatch(result, "[^\r\n]+") do
       local workspace, monitor = line:match("^([^\t]+)\t(.+)$")
@@ -201,12 +240,14 @@ local function sync_workspaces(callback)
     for workspace, _ in pairs(spaces) do
       if not seen[workspace] then
         remove_space(workspace)
+        structure_changed = true
       end
     end
 
     for _, workspace in ipairs(ordered) do
       if spaces[workspace] == nil then
         create_space(workspace)
+        structure_changed = true
       end
 
       local monitor = monitor_by_workspace[workspace]
@@ -217,8 +258,13 @@ local function sync_workspaces(callback)
       end
     end
 
+    if not same_workspace_order(workspace_order, ordered) then
+      structure_changed = true
+    end
     workspace_order = ordered
-    reorder_aux_items()
+    if structure_changed then
+      reorder_aux_items(true)
+    end
 
     if callback ~= nil then
       callback()
@@ -226,7 +272,7 @@ local function sync_workspaces(callback)
   end)
 end
 
-local function update_windows_on_spaces()
+local function update_windows_on_spaces(callback)
   sbar.exec("aerospace list-windows --all --format '%{workspace}\t%{app-name}' 2>/dev/null", function(result)
     local apps_by_space = {}
     local seen_by_space = {}
@@ -254,14 +300,47 @@ local function update_windows_on_spaces()
         end
       end
     end)
+
+    if callback ~= nil then
+      callback()
+    end
+  end)
+end
+
+local function run_refresh(focused_workspace)
+  refresh_running = true
+  sync_workspaces(function()
+    update_focused_space(focused_workspace)
+    update_windows_on_spaces(function()
+      refresh_running = false
+
+      if refresh_queued then
+        local queued = queued_focused_workspace
+        refresh_queued = false
+        queued_focused_workspace = nil
+        sbar.exec("true", function()
+          run_refresh(queued)
+        end)
+      end
+    end)
   end)
 end
 
 local function refresh_spaces(focused_workspace)
-  sync_workspaces(function()
-    update_focused_space(focused_workspace)
-    update_windows_on_spaces()
-  end)
+  local focused = trim(focused_workspace)
+  if focused == "" then
+    focused = nil
+  end
+
+  if refresh_running then
+    refresh_queued = true
+    if focused ~= nil then
+      queued_focused_workspace = focused
+    end
+    return
+  end
+
+  run_refresh(focused)
 end
 
 sbar.add("event", "aerospace_workspace_change")
