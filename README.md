@@ -2,7 +2,7 @@
 
 Personal configuration files for a powerful macOS development environment.
 
-This code isn't my original work, it is a combination and refinement of code that others have created and shared online over the past several years. 
+This code isn't my original work, it is a combination and refinement of code that others have created and shared online over the past several years.
 Therefore, I do not hold the copyright.
 
 ## ✨ Overview
@@ -37,6 +37,9 @@ ln -sf "$PWD/vim/.vimrc" ~/.vimrc
 
 # AeroSpace window manager
 ln -sf "$PWD/aerospace/.aerospace.toml" ~/.aerospace.toml
+
+# Jankyborders
+ln -sf "$PWD/borders" ~/.config/borders
 
 # Zsh shell
 ln -sf "$PWD/zsh/.zshrc" ~/.zshrc
