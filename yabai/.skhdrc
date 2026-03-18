@@ -1,5 +1,5 @@
 # opens kitty
-alt - return : "${HOME}"/Dotfiles/yabai/scripts/open_kitty.sh
+alt - return : "${HOME}"/Dotfiles/yabai/scripts/open_ghostty.sh
 
 # Navigation
 alt - h : yabai -m window --focus west
