@@ -20,3 +20,8 @@ end)
 front_app:subscribe("mouse.clicked", function(env)
   sbar.trigger("swap_menus_and_spaces")
 end)
+
+sbar.exec(
+  "sketchybar --query spaces.indicator >/dev/null 2>&1"
+    .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
+)
