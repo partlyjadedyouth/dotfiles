@@ -32,7 +32,7 @@ PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 [gaps]
 inner.horizontal = 10
 inner.vertical = 10
-outer.top = [{ monitor."DELL" = 40 }, 8]
+outer.top = [{ monitor."DELL" = 40 }, {monitor."MAG" = 40}, 8]
 outer.bottom = 4
 outer.left = 4
 outer.right = 4
