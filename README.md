@@ -1,61 +1,137 @@
-# 🛠️ Dotfiles
+# Dotfiles
 
-Personal configuration files for a powerful macOS development environment.
+Personal macOS dotfiles for a development setup built around AeroSpace, SketchyBar, Zsh, and Vim.
 
-This code isn't my original work, it is a combination and refinement of code that others have created and shared online over the past several years.
-Therefore, I do not hold the copyright.
+This repo is a working collection of personal tweaks, borrowed ideas, and refinements collected over time.
 
-## ✨ Overview
+## What Is Included
 
-This repository contains my configuration files for:
+- `git/`: global Git config and ignore rules
+- `zsh/`: `oh-my-zsh` shell setup with `powerlevel10k`, aliases, and language/toolchain bootstrapping
+- `vim/`: a small `.vimrc` that layers on top of `amix/vimrc`
+- `aerospace/`: AeroSpace tiling window manager config and keybindings
+- `sketchybar/`: Lua-based SketchyBar setup with workspace, app, and system widgets
+- `borders/`: JankyBorders config for active window borders
 
-- **🔧 Git** - Version control settings with global gitignore rules
-- **📝 Vim** - Lightweight text editor configuration
-- **🐚 Zsh** - Enhanced shell with custom aliases and functions
-- **🪟 AeroSpace** - Tiling window manager for efficient workspace management
-- **📊 SketchyBar** - Modern customizable menu bar with system monitoring widgets
+## Platform Assumptions
 
-## 🚀 Quick Installation
+These dotfiles are intended for macOS and assume Apple Silicon-style Homebrew paths such as `/opt/homebrew/...`.
 
-Clone this repository and run the following commands to symlink all configurations:
+Some configs also assume these tools are installed:
+
+- [Homebrew](https://brew.sh/)
+- [AeroSpace](https://github.com/nikitabobko/AeroSpace)
+- [SketchyBar](https://felixkratz.github.io/SketchyBar/)
+- [JankyBorders](https://github.com/FelixKratz/JankyBorders)
+- `oh-my-zsh`
+- `powerlevel10k`
+- `nvm`
+- `rbenv`
+- Anaconda or Miniconda if you want the existing `conda` initialization to work
+- Xcode Command Line Tools, because SketchyBar helper binaries are compiled with `make`
+
+Optional tools referenced by the configs:
+
+- `Ghostty`
+- `logo-ls`
+- `SwitchAudioSource`
+
+## Install
+
+Clone the repository:
 
 ```bash
-# Clone repository
 git clone https://github.com/partlyjadedyouth/dotfiles.git ~/Dotfiles
 cd ~/Dotfiles
-
-# Git configuration
-ln -sf "$PWD/git/.gitconfig" ~/.gitconfig
-ln -sf "$PWD/git/.gitignore_global" ~/.gitignore_global
-
-# SketchyBar configuration (create config directory if needed)
-mkdir -p ~/.config
-ln -sf "$PWD/sketchybar" ~/.config/sketchybar
-
-# Vim configuration
-ln -sf "$PWD/vim/.vimrc" ~/.vimrc
-
-# AeroSpace window manager
-ln -sf "$PWD/aerospace/.aerospace.toml" ~/.aerospace.toml
-
-# Jankyborders
-ln -sf "$PWD/borders" ~/.config/borders
-
-# Zsh shell
-ln -sf "$PWD/zsh/.zshrc" ~/.zshrc
 ```
 
-## 🧩 SketchyBar + AeroSpace
+Create the symlinks:
+
+```bash
+mkdir -p ~/.config
+
+ln -sfn "$PWD/git/.gitconfig" ~/.gitconfig
+ln -sfn "$PWD/git/.gitignore_global" ~/.gitignore_global
+
+ln -sfn "$PWD/zsh/.zshrc" ~/.zshrc
+ln -sfn "$PWD/vim/.vimrc" ~/.vimrc
+
+ln -sfn "$PWD/aerospace/.aerospace.toml" ~/.aerospace.toml
+ln -sfn "$PWD/sketchybar" ~/.config/sketchybar
+ln -sfn "$PWD/borders" ~/.config/borders
+```
+
+## Extra Setup
+
+### Vim
+
+`vim/.vimrc` expects the `amix/vimrc` runtime to exist at `~/.vim_runtime`:
+
+```bash
+git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
+sh ~/.vim_runtime/install_awesome_vimrc.sh
+```
+
+### Zsh
+
+`zsh/.zshrc` assumes:
+
+- `oh-my-zsh` is installed at `~/.oh-my-zsh`
+- `powerlevel10k` is available as an `oh-my-zsh` theme
+- Homebrew is installed in `/opt/homebrew`
+
+If you do not use `nvm`, `rbenv`, `conda`, `logo-ls`, or Windsurf, you may want to remove or guard those lines in [`zsh/.zshrc`](zsh/.zshrc).
+
+### SketchyBar
+
+This setup compiles helper binaries from [`sketchybar/helpers/`](sketchybar/helpers/) on startup, so `make` and the macOS command line toolchain need to be available.
+
+The bar also expects:
+
+- the SketchyBar Lua integration to be installed
+- SF Pro / SF Mono fonts, or a compatible replacement
+- AeroSpace to be installed, because workspace widgets are driven by `aerospace` events and shell commands
+
+## Notable Behavior
+
+### AeroSpace + SketchyBar integration
 
 The workspace section in SketchyBar is driven by AeroSpace events and supports:
 
-- Dynamic workspace names (numeric/alphabetic/custom)
-- Dynamic workspace count (no fixed workspace list)
-- Per-monitor workspace visibility (each display shows only its own workspaces)
-- App icons per workspace, refreshed when windows/apps are created, focused, or closed
+- dynamic workspace names
+- dynamic workspace creation and removal
+- per-monitor workspace visibility
+- app icons per workspace
+- workspace switching and moving windows by clicking the bar
 
 Relevant files:
 
 - [`aerospace/.aerospace.toml`](aerospace/.aerospace.toml)
 - [`sketchybar/items/spaces.lua`](sketchybar/items/spaces.lua)
 - [`sketchybar/helpers/app_icons.lua`](sketchybar/helpers/app_icons.lua)
+
+### AeroSpace bindings
+
+The AeroSpace config includes bindings for:
+
+- directional focus and window swapping
+- moving windows between monitors and workspaces
+- previous/next workspace navigation
+- summoning workspaces
+- resizing, balancing, and layout changes
+- toggling floating and fullscreen modes
+- launching `Ghostty` with `alt-enter`
+
+## Repository Layout
+
+```text
+.
+|-- aerospace/
+|-- borders/
+|-- git/
+|-- sketchybar/
+|   |-- helpers/
+|   `-- items/
+|-- vim/
+`-- zsh/
+```
