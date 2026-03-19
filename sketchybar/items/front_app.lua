@@ -21,9 +21,4 @@ front_app:subscribe("mouse.clicked", function(env)
   sbar.trigger("swap_menus_and_spaces")
 end)
 
-sbar.exec(
-  "sketchybar --query apple.logo >/dev/null 2>&1"
-    .. " && sketchybar --move spaces.indicator after apple.logo >/dev/null 2>&1;"
-    .. " sketchybar --query spaces.indicator >/dev/null 2>&1"
-    .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
-)
+sbar.exec("sketchybar --trigger windows_on_spaces >/dev/null 2>&1")

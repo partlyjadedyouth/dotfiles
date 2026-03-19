@@ -32,10 +32,7 @@ end
 
 local function reorder_aux_items(with_retry)
   local move_commands = {}
-  local anchor_name = "spaces.indicator"
-
-  move_commands[#move_commands + 1] = "sketchybar --query apple.logo >/dev/null 2>&1"
-    .. " && sketchybar --move spaces.indicator after apple.logo >/dev/null 2>&1"
+  local anchor_name = "apple.logo"
 
   for _, workspace in ipairs(workspace_order) do
     local space = spaces[workspace]
@@ -60,8 +57,13 @@ local function reorder_aux_items(with_retry)
     end
   end
 
+  move_commands[#move_commands + 1] = "sketchybar --query spaces.indicator >/dev/null 2>&1"
+    .. " && sketchybar --move spaces.indicator after "
+    .. shell_escape(anchor_name)
+    .. " >/dev/null 2>&1"
+
   move_commands[#move_commands + 1] = "sketchybar --query front_app >/dev/null 2>&1"
-    .. " && sketchybar --move front_app after spaces.indicator >/dev/null 2>&1"
+    .. " && sketchybar --move front_app after 'spaces.indicator' >/dev/null 2>&1"
 
   local command = table.concat(move_commands, "; ")
   sbar.exec(command)
