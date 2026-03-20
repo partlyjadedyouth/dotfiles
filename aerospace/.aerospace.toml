@@ -62,10 +62,6 @@ if.window-title-regex-substring = '^(General|(Tab|Password|Website|Extension)s|A
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^macfeh$'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-name-regex-substring = '^App Store$'
 run = 'layout floating'
 
@@ -74,19 +70,11 @@ if.app-name-regex-substring = '^Activity Monitor$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^KeePassXC$'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-name-regex-substring = '^Calculator$'
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = '^Dictionary$'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-name-regex-substring = '^mpv$'
 run = 'layout floating'
 
 [[on-window-detected]]
@@ -115,10 +103,6 @@ if.app-name-regex-substring = '^Calendar$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Across$'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-name-regex-substring = '^Keka$'
 run = 'layout floating'
 
@@ -136,10 +120,6 @@ run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = '^FaceTime$'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-name-regex-substring = '^TheBoringNotch$'
 run = 'layout floating'
 
 [mode.main.binding]

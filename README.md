@@ -63,25 +63,6 @@ ln -sfn "$PWD/borders" ~/.config/borders
 
 ## Extra Setup
 
-### Vim
-
-`vim/.vimrc` expects the `amix/vimrc` runtime to exist at `~/.vim_runtime`:
-
-```bash
-git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
-sh ~/.vim_runtime/install_awesome_vimrc.sh
-```
-
-### Zsh
-
-`zsh/.zshrc` assumes:
-
-- `oh-my-zsh` is installed at `~/.oh-my-zsh`
-- `powerlevel10k` is available as an `oh-my-zsh` theme
-- Homebrew is installed in `/opt/homebrew`
-
-If you do not use `nvm`, `rbenv`, `conda`, `logo-ls`, or Windsurf, you may want to remove or guard those lines in [`zsh/.zshrc`](zsh/.zshrc).
-
 ### SketchyBar
 
 This setup compiles helper binaries from [`sketchybar/helpers/`](sketchybar/helpers/) on startup, so `make` and the macOS command line toolchain need to be available.
