@@ -48,33 +48,33 @@ check-further-callbacks = true
 run = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^System Settings$'
+if.app-name-regex-substring = 'System Settings'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Finder$'
+if.app-name-regex-substring = 'Finder'
 if.window-title-regex-substring = 'Co(py|nnect)|Move|Info|Pref'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Safari$'
+if.app-name-regex-substring = 'Safari'
 if.window-title-regex-substring = '^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^App Store$'
+if.app-name-regex-substring = 'App Store'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Activity Monitor$'
+if.app-name-regex-substring = 'Activity Monitor'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Calculator$'
+if.app-name-regex-substring = 'Calculator'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Dictionary$'
+if.app-name-regex-substring = 'Dictionary'
 run = 'layout floating'
 
 [[on-window-detected]]
@@ -82,44 +82,44 @@ if.window-title-regex-substring = '^Software Update$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^System Information$'
+if.app-name-regex-substring = 'System Information'
 if.window-title-regex-substring = '^About This Mac$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^KakaoTalk$'
+if.app-name-regex-substring = 'KakaoTalk'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Music$'
+if.app-name-regex-substring = 'Music'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^음악$'
+if.app-name-regex-substring = '음악'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Calendar$'
+if.app-name-regex-substring = 'Calendar'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Keka$'
+if.app-name-regex-substring = 'Keka'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^AppCleaner$'
+if.app-name-regex-substring = 'AppCleaner'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^SwitchIM$'
+if.app-name-regex-substring = 'SwitchIM'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^Photo Booth$'
+if.app-name-regex-substring = 'Photo Booth'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '^FaceTime$'
+if.app-name-regex-substring = 'FaceTime'
 run = 'layout floating'
 
 [mode.main.binding]
