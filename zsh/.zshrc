@@ -112,14 +112,6 @@ source $ZSH/oh-my-zsh.sh
 
 eval $(/opt/homebrew/bin/brew shellenv)
 
-alias ls='logo-ls'
-alias la='logo-ls -A'
-alias ll='logo-ls -al'
-# equivalents with Git Status on by Default
-alias lsg='logo-ls -D'
-alias lag='logo-ls -AD'
-alias llg='logo-ls -alD'
-
 # alias Developer folder
 alias cdv='cd ~/Developer'
 
