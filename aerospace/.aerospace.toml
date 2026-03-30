@@ -163,9 +163,9 @@ alt-cmd-shift-3 = 'summon-workspace 3'
 alt-cmd-shift-4 = 'summon-workspace 4'
 alt-cmd-shift-5 = 'summon-workspace 5'
 
-alt-cmd-minus = 'resize smart -50'
-alt-cmd-equal = 'resize smart +50'
-alt-cmd-e = 'balance-sizes'
+ctrl-alt-minus = 'resize smart -50'
+ctrl-alt-equal = 'resize smart +50'
+ctrl-alt-e = 'balance-sizes'
 
 alt-r = 'flatten-workspace-tree'
 alt-shift-r = 'reload-config'
