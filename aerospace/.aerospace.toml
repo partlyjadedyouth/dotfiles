@@ -13,14 +13,10 @@ on-focus-changed = [
   'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 ]
 automatically-unhide-macos-hidden-apps = false
-persistent-workspaces = ['1', '2', '3']
+persistent-workspaces = ['1']
 
 [workspace-to-monitor-force-assignment] 
-1 = 'main' 
-2 = 'main' 
-3 = 'main'
-4 = ['secondary', 'main']
-5 = ['secondary', 'main']
+1 = ['main', 'secondary']
 
 exec-on-workspace-change = ['/bin/bash', '-c',
   '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE PREV=$AEROSPACE_PREV_WORKSPACE'
