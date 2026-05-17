@@ -13,10 +13,18 @@ on-focus-changed = [
   'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 ]
 automatically-unhide-macos-hidden-apps = false
-persistent-workspaces = ['1']
+persistent-workspaces = ['1', '2', '3', '6']
 
 [workspace-to-monitor-force-assignment] 
-1 = ['main', 'secondary']
+1 = ['main']
+2 = ['main']
+3 = ['main']
+4 = ['main']
+5 = ['main']
+6 = ['secondary']
+7 = ['secondary']
+8 = ['secondary']
+9 = ['secondary']
 
 exec-on-workspace-change = ['/bin/bash', '-c',
   '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE PREV=$AEROSPACE_PREV_WORKSPACE'
@@ -85,19 +93,17 @@ if.window-title-regex-substring = '^About This Mac$'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'KakaoTalk'
+if.app-id = 'com.kakao.KakaoTalkMac'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'Music'
+if.app-id = 'com.apple.iCal'
+if.during-aerospace-startup = true
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = '음악'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Calendar'
+if.app-id = 'com.apple.iCal'
+if.during-aerospace-startup = false
 run = 'layout floating'
 
 [[on-window-detected]]
@@ -144,6 +150,10 @@ alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
 alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'
 alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'
 alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'
+alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6'
+alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'
+alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'
+alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'
 
 alt-cmd-z = 'workspace prev'
 alt-cmd-x = 'workspace next'
@@ -152,6 +162,10 @@ alt-cmd-2 = 'workspace 2'
 alt-cmd-3 = 'workspace 3'
 alt-cmd-4 = 'workspace 4'
 alt-cmd-5 = 'workspace 5'
+alt-cmd-6 = 'workspace 6'
+alt-cmd-7 = 'workspace 7'
+alt-cmd-8 = 'workspace 8'
+alt-cmd-9 = 'workspace 9'
 
 alt-cmd-shift-1 = 'summon-workspace 1'
 alt-cmd-shift-2 = 'summon-workspace 2'
