@@ -1,3 +1,4 @@
+# Core startup and normalization settings
 config-version = 2
 start-at-login = true
 
@@ -8,6 +9,7 @@ default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 accordion-padding = 30
 
+# Focus-change hooks
 on-focus-changed = [
   'move-mouse window-lazy-center',
   'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
@@ -15,6 +17,7 @@ on-focus-changed = [
 automatically-unhide-macos-hidden-apps = false
 persistent-workspaces = ['1', '2', '3', '4', '5']
 
+# Workspace monitor assignment
 [workspace-to-monitor-force-assignment] 
 1 = ['main']
 2 = ['main']
@@ -26,21 +29,26 @@ persistent-workspaces = ['1', '2', '3', '4', '5']
 8 = ['secondary']
 9 = ['secondary']
 
+# Workspace-change hooks
 exec-on-workspace-change = ['/bin/bash', '-c',
   '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE PREV=$AEROSPACE_PREV_WORKSPACE'
 ]
 
+# Startup hooks
 after-startup-command = [
   'exec-and-forget /bin/bash -c "/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$(aerospace list-workspaces --focused | head -n 1); /opt/homebrew/bin/sketchybar --trigger windows_on_spaces"',
   'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0',
 ]
 
+# Exec environment
 [exec]
 inherit-env-vars = true
 
+# Shell PATH
 [exec.env-vars]
 PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
+# Window gaps
 [gaps]
 inner.horizontal = 10
 inner.vertical = 10
@@ -98,12 +106,6 @@ run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
-if.during-aerospace-startup = true
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.iCal'
-if.during-aerospace-startup = false
 run = 'layout floating'
 
 [[on-window-detected]]
@@ -115,10 +117,6 @@ if.app-name-regex-substring = 'AppCleaner'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'SwitchIM'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-name-regex-substring = 'Photo Booth'
 run = 'layout floating'
 
@@ -126,9 +124,11 @@ run = 'layout floating'
 if.app-name-regex-substring = 'FaceTime'
 run = 'layout floating'
 
+# Main key bindings
 [mode.main.binding]
 alt-enter = 'exec-and-forget open -na Ghostty'
 
+# Focus movement
 alt-h = 'focus left'
 alt-j = 'focus down'
 alt-k = 'focus up'
@@ -139,11 +139,13 @@ alt-shift-j = 'swap down'
 alt-shift-k = 'swap up'
 alt-shift-l = 'swap right'
 
+# Window joins
 alt-shift-cmd-h = 'join-with left'
 alt-shift-cmd-j = 'join-with down'
 alt-shift-cmd-k = 'join-with up'
 alt-shift-cmd-l = 'join-with right'
 
+# Move windows to monitors/workspaces
 alt-shift-m = 'move-node-to-monitor --focus-follows-window next'
 alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
 alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
@@ -155,6 +157,7 @@ alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'
 alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'
 alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'
 
+# Workspace switching
 alt-cmd-z = 'workspace prev'
 alt-cmd-x = 'workspace next'
 alt-cmd-1 = 'workspace 1'
@@ -167,21 +170,25 @@ alt-cmd-7 = 'workspace 7'
 alt-cmd-8 = 'workspace 8'
 alt-cmd-9 = 'workspace 9'
 
+# Summon workspaces
 alt-cmd-shift-1 = 'summon-workspace 1'
 alt-cmd-shift-2 = 'summon-workspace 2'
 alt-cmd-shift-3 = 'summon-workspace 3'
 alt-cmd-shift-4 = 'summon-workspace 4'
 alt-cmd-shift-5 = 'summon-workspace 5'
 
+# Resize and balance
 ctrl-alt-minus = 'resize smart -50'
 ctrl-alt-equal = 'resize smart +50'
 ctrl-alt-e = 'balance-sizes'
 
+# Layout maintenance
 alt-r = 'flatten-workspace-tree'
 alt-shift-r = 'reload-config'
 alt-x = 'layout horizontal'
 alt-y = 'layout vertical'
 
+# Floating and fullscreen toggles
 alt-shift-space = [
   'layout floating tiling',
   'exec-and-forget /bin/bash -c "sketchybar --trigger window_focus"'
@@ -193,5 +200,6 @@ alt-f = [
 ]
 alt-shift-f = 'macos-native-fullscreen'
 
+# Miscellaneous workspace controls
 alt-comma = 'layout tiles accordion'
 alt-tab = 'workspace-back-and-forth'
