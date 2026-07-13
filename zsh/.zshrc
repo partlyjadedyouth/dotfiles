@@ -129,7 +129,6 @@ export NVM_DIR="$HOME/.nvm"
 eval "$(rbenv init - zsh)"
 export PATH=$PATH:$HOME/.pub-cache/bin
 
-
 # Added by Windsurf
 export PATH="/Users/joon/.codeium/windsurf/bin:$PATH"
 
@@ -148,5 +147,6 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-
 alias claude="/Users/joon/.claude/local/claude"
+
+export PATH="$HOME/.local/bin:$PATH"

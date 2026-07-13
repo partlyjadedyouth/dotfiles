@@ -19,6 +19,7 @@ return {
 	["Arc"] = ":arc:",
 	["Arduino"] = ":arduino:",
 	["Arduino IDE"] = ":arduino:",
+	["ATLAS.ti"] = ":apple_books:",
 	["Atom"] = ":atom:",
 	["Audacity"] = ":audacity:",
 	["Bambu Studio"] = ":bambu_studio:",
