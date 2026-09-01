@@ -220,7 +220,7 @@ local function create_space(workspace)
 end
 
 local function sync_workspaces(callback)
-  sbar.exec("aerospace list-workspaces --all --format '%{workspace}\t%{monitor-id}' 2>/dev/null", function(result)
+  sbar.exec("aerospace list-workspaces --all --format '%{workspace}\t%{monitor-appkit-nsscreen-screens-id}' 2>/dev/null", function(result)
     local seen = {}
     local ordered = {}
     local monitor_by_workspace = {}

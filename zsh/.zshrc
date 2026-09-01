@@ -147,6 +147,14 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-alias claude="/Users/joon/.claude/local/claude"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/joon/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/joon/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/joon/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/joon/google-cloud-sdk/completion.zsh.inc'; fi
+
+# opencodex claude-env hook
+[ -f ~/.opencodex/claude-env.sh ] && source ~/.opencodex/claude-env.sh

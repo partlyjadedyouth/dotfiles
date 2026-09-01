@@ -59,6 +59,7 @@ ln -sfn "$PWD/vim/.vimrc" ~/.vimrc
 ln -sfn "$PWD/aerospace/.aerospace.toml" ~/.aerospace.toml
 ln -sfn "$PWD/sketchybar" ~/.config/sketchybar
 ln -sfn "$PWD/borders" ~/.config/borders
+ln -sfn "$PWD/ghostty" ~/.config/ghostty
 ```
 
 ## Extra Setup
