@@ -12,6 +12,7 @@ This repo is a working collection of personal tweaks, borrowed ideas, and refine
 - `aerospace/`: AeroSpace tiling window manager config and keybindings
 - `sketchybar/`: Lua-based SketchyBar setup with workspace, app, and system widgets
 - `borders/`: JankyBorders config for active window borders
+- `ghostty/`: Ghostty terminal config (theme and fonts)
 
 ## Platform Assumptions
 
@@ -110,6 +111,7 @@ The AeroSpace config includes bindings for:
 .
 |-- aerospace/
 |-- borders/
+|-- ghostty/
 |-- git/
 |-- sketchybar/
 |   |-- helpers/
