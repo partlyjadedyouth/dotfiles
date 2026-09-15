@@ -120,6 +120,9 @@ alias gam='git add . && git commit -m'
 alias gpo='git push origin'
 alias gpl='git pull'
 
+# alias obsidian vault 
+alias cdo='cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/joon'
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
@@ -156,5 +159,3 @@ if [ -f '/Users/joon/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/joon/googl
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/joon/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/joon/google-cloud-sdk/completion.zsh.inc'; fi
 
-# opencodex claude-env hook
-[ -f ~/.opencodex/claude-env.sh ] && source ~/.opencodex/claude-env.sh
