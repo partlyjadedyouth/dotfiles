@@ -121,7 +121,7 @@ alias gpo='git push origin'
 alias gpl='git pull'
 
 # alias obsidian vault 
-alias cdo='cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/joon'
+alias cdo='cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/joonyoung'
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
