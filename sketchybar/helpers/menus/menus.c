@@ -94,6 +94,7 @@ void ax_print_menu_options(AXUIElementRef app) {
 
 AXUIElementRef ax_get_extra_menu_item(char* alias) {
   pid_t pid = 0;
+  bool match_owner = false;
   CGRect bounds = CGRectNull;
   CFArrayRef window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll,
                                                       kCGNullWindowID        );
@@ -116,7 +117,7 @@ AXUIElementRef ax_get_extra_menu_item(char* alias) {
     CFDictionaryRef bounds_ref = CFDictionaryGetValue(dictionary,
                                                       kCGWindowBounds);
 
-    if (!name_ref || !owner_ref || !owner_pid_ref || !layer_ref || !bounds_ref)
+    if (!owner_ref || !owner_pid_ref || !layer_ref || !bounds_ref)
       continue;
 
     long long int layer = 0;
@@ -126,22 +127,26 @@ AXUIElementRef ax_get_extra_menu_item(char* alias) {
                      CFNumberGetType(owner_pid_ref),
                      &owner_pid                     );
 
-    if (layer != 0x19) continue;
-    bounds = CGRectNull;
-    if (!CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds)) continue;
     CFStringGetCString(owner_ref,
                        owner_buffer,
                        sizeof(owner_buffer),
                        kCFStringEncodingUTF8);
+    // App-only lookup needs a PID, not a particular status-item window.
+    if (layer != 0x19 && strcmp(owner_buffer, alias) != 0) continue;
+    bounds = CGRectNull;
+    if (!CGRectMakeWithDictionaryRepresentation(bounds_ref, &bounds)) continue;
 
-    CFStringGetCString(name_ref,
+    name_buffer[0] = '\0';
+    if (name_ref) CFStringGetCString(name_ref,
                        name_buffer,
                        sizeof(name_buffer),
                        kCFStringEncodingUTF8);
     snprintf(buffer, sizeof(buffer), "%s,%s", owner_buffer, name_buffer);
 
-    if (strcmp(buffer, alias) == 0) {
+    // An app name selects its first status item; app,item selects a specific one.
+    if (strcmp(buffer, alias) == 0 || strcmp(owner_buffer, alias) == 0) {
       pid = owner_pid;
+      match_owner = strcmp(owner_buffer, alias) == 0;
       break;
     }
   }
@@ -165,6 +170,10 @@ AXUIElementRef ax_get_extra_menu_item(char* alias) {
       uint32_t count = CFArrayGetCount(children_ref);
       for (uint32_t i = 0; i < count; i++) {
         AXUIElementRef item = CFArrayGetValueAtIndex(children_ref, i);
+        if (match_owner) {
+          result = (AXUIElementRef)CFRetain(item);
+          break;
+        }
         CFTypeRef position_ref = NULL;
         CFTypeRef size_ref = NULL;
         AXUIElementCopyAttributeValue(item, kAXPositionAttribute,
@@ -183,13 +192,15 @@ AXUIElementRef ax_get_extra_menu_item(char* alias) {
         // printf("%f %f\n", position.x, bounds.origin.x);
         if (error == kAXErrorSuccess
             && fabs(position.x - bounds.origin.x) <= 10) {
-          result = item;
+          result = (AXUIElementRef)CFRetain(item);
           break;
         }
       }
     }
   }
 
+  if (children_ref) CFRelease(children_ref);
+  if (extras) CFRelease(extras);
   CFRelease(app);
   return result;
 }
@@ -225,8 +236,13 @@ AXUIElementRef ax_get_front_app() {
 }
 
 int main (int argc, char **argv) {
+  if (argc == 2 && strcmp(argv[1], "--check-access") == 0) {
+    bool trusted = AXIsProcessTrusted();
+    fprintf(stdout, "Accessibility access: %s\n", trusted ? "granted" : "required");
+    return trusted ? 0 : 1;
+  }
   if (argc == 1) {
-    printf("Usage: %s [-l | -s id/alias ]\n", argv[0]);
+    printf("Usage: %s [-l | -s id/app/app,item ]\n", argv[0]);
     exit(0);
   }
   ax_init();
