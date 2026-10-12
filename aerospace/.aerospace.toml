@@ -15,7 +15,7 @@ on-focus-changed = [
   'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 ]
 automatically-unhide-macos-hidden-apps = false
-persistent-workspaces = ['W̲eb', 'N̲ote', 'C̲omm', 'A̲I', 'D̲ev', 'R̲ead', 'M̲us']
+persistent-workspaces = ['W̲eb', 'Note̲', 'C̲omm', 'A̲I', 'D̲ev', 'R̲ead', 'M̲usic']
 
 # Workspace-change hooks
 exec-on-workspace-change = ['/bin/bash', '-c',
@@ -59,7 +59,7 @@ run = 'move-node-to-workspace --focus-follows-window W̲eb'
 [[on-window-detected]]
 if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id)$"'
 check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window N̲ote'
+run = 'move-node-to-workspace --focus-follows-window Note̲'
 
 [[on-window-detected]]
 if = 'test %{app-bundle-id} ~= "^(com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal)$"'
@@ -84,13 +84,13 @@ run = 'move-node-to-workspace --focus-follows-window R̲ead'
 [[on-window-detected]]
 if = 'test %{app-bundle-id} ~= "^(com[.]spotify[.]client)$"'
 check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window M̲us'
+run = 'move-node-to-workspace --focus-follows-window M̲usic'
 
-# Unassigned apps default to 1; workspace 2 is available for manual grouping.
+# Unassigned apps default to Z1; workspace Z2 is available for manual grouping.
 [[on-window-detected]]
 if = 'test-not %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia|md[.]obsidian|notion[.]id|com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal|com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop|com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty|com[.]apple[.]Preview|com[.]spotify[.]client)$"'
 check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window 1'
+run = 'move-node-to-workspace --focus-follows-window Z1'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'System Settings'
@@ -176,41 +176,41 @@ alt-shift-cmd-j = 'join-with down'
 alt-shift-cmd-k = 'join-with up'
 alt-shift-cmd-l = 'join-with right'
 
-# Workspace keys: W=W̲eb, N=N̲ote, C=C̲omm, A=A̲I, D=D̲ev, R=R̲ead, M=Music.
+# Workspace keys: W=W̲eb, E=Note̲, C=C̲omm, A=A̲I, D=D̲ev, R=R̲ead, M=Music.
 # Move a window and follow it (reload-config uses ctrl-alt-r).
 alt-shift-w = 'move-node-to-workspace --focus-follows-window W̲eb'
-alt-shift-n = 'move-node-to-workspace --focus-follows-window N̲ote'
+alt-shift-e = 'move-node-to-workspace --focus-follows-window Note̲'
 alt-shift-c = 'move-node-to-workspace --focus-follows-window C̲omm'
 alt-shift-a = 'move-node-to-workspace --focus-follows-window A̲I'
 alt-shift-d = 'move-node-to-workspace --focus-follows-window D̲ev'
 alt-shift-r = 'move-node-to-workspace --focus-follows-window R̲ead'
-alt-shift-m = 'move-node-to-workspace --focus-follows-window M̲us'
-alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
-alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
+alt-shift-m = 'move-node-to-workspace --focus-follows-window M̲usic'
+alt-shift-1 = 'move-node-to-workspace --focus-follows-window Z1'
+alt-shift-2 = 'move-node-to-workspace --focus-follows-window Z2'
 
 # Workspace switching; existing previous/next navigation stays unchanged.
 alt-cmd-z = 'workspace prev'
 alt-cmd-x = 'workspace next'
 alt-cmd-w = 'workspace W̲eb'
-alt-cmd-n = 'workspace N̲ote'
+alt-cmd-e = 'workspace Note̲'
 alt-cmd-c = 'workspace C̲omm'
 alt-cmd-a = 'workspace A̲I'
 alt-cmd-d = 'workspace D̲ev'
 alt-cmd-r = 'workspace R̲ead'
-alt-cmd-m = 'workspace M̲us'
-alt-cmd-1 = 'workspace 1'
-alt-cmd-2 = 'workspace 2'
+alt-cmd-m = 'workspace M̲usic'
+alt-cmd-1 = 'workspace Z1'
+alt-cmd-2 = 'workspace Z2'
 
 # Summon workspaces
 alt-cmd-shift-w = 'summon-workspace W̲eb'
-alt-cmd-shift-n = 'summon-workspace N̲ote'
+alt-cmd-shift-e = 'summon-workspace Note̲'
 alt-cmd-shift-c = 'summon-workspace C̲omm'
 alt-cmd-shift-a = 'summon-workspace A̲I'
 alt-cmd-shift-d = 'summon-workspace D̲ev'
 alt-cmd-shift-r = 'summon-workspace R̲ead'
-alt-cmd-shift-m = 'summon-workspace M̲us'
-alt-cmd-shift-1 = 'summon-workspace 1'
-alt-cmd-shift-2 = 'summon-workspace 2'
+alt-cmd-shift-m = 'summon-workspace M̲usic'
+alt-cmd-shift-1 = 'summon-workspace Z1'
+alt-cmd-shift-2 = 'summon-workspace Z2'
 
 # Resize and balance
 ctrl-alt-minus = 'resize smart -50'
