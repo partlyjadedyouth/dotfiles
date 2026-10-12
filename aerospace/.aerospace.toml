@@ -15,19 +15,7 @@ on-focus-changed = [
   'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 ]
 automatically-unhide-macos-hidden-apps = false
-persistent-workspaces = ['1', '2', '3', '4', '5']
-
-# Workspace monitor assignment
-[workspace-to-monitor-force-assignment] 
-1 = ['main']
-2 = ['main']
-3 = ['main']
-4 = ['main']
-5 = ['secondary']
-6 = ['secondary']
-7 = ['secondary']
-8 = ['secondary']
-9 = ['secondary']
+persistent-workspaces = ['W̲eb', 'N̲ote', 'C̲omm', 'A̲I', 'D̲ev', 'R̲ead', 'M̲us']
 
 # Workspace-change hooks
 exec-on-workspace-change = ['/bin/bash', '-c',
@@ -60,6 +48,49 @@ outer.right = 4
 [[on-window-detected]]
 check-further-callbacks = true
 run = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
+
+# Route newly detected windows only: manual moves persist until a new window opens.
+# Continue into the original floating rules below without changing their layouts.
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window W̲eb'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window N̲ote'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window C̲omm'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window A̲I'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window D̲ev'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]apple[.]Preview)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window R̲ead'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]spotify[.]client)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window M̲us'
+
+# Unassigned apps default to 1; workspace 2 is available for manual grouping.
+[[on-window-detected]]
+if = 'test-not %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia|md[.]obsidian|notion[.]id|com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal|com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop|com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty|com[.]apple[.]Preview|com[.]spotify[.]client)$"'
+check-further-callbacks = true
+run = 'move-node-to-workspace --focus-follows-window 1'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'System Settings'
@@ -145,43 +176,41 @@ alt-shift-cmd-j = 'join-with down'
 alt-shift-cmd-k = 'join-with up'
 alt-shift-cmd-l = 'join-with right'
 
-# Move windows to monitors/workspaces
-alt-shift-m = 'move-node-to-monitor --focus-follows-window next'
+# Workspace keys: W=W̲eb, N=N̲ote, C=C̲omm, A=A̲I, D=D̲ev, R=R̲ead, M=Music.
+# Move a window and follow it (reload-config uses ctrl-alt-r).
+alt-shift-w = 'move-node-to-workspace --focus-follows-window W̲eb'
+alt-shift-n = 'move-node-to-workspace --focus-follows-window N̲ote'
+alt-shift-c = 'move-node-to-workspace --focus-follows-window C̲omm'
+alt-shift-a = 'move-node-to-workspace --focus-follows-window A̲I'
+alt-shift-d = 'move-node-to-workspace --focus-follows-window D̲ev'
+alt-shift-r = 'move-node-to-workspace --focus-follows-window R̲ead'
+alt-shift-m = 'move-node-to-workspace --focus-follows-window M̲us'
 alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
 alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
-alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'
-alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'
-alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'
-alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6'
-alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'
-alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'
-alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'
-alt-shift-a = 'move-node-to-workspace --focus-follows-window a'
-alt-shift-b = 'move-node-to-workspace --focus-follows-window b'
-alt-shift-c = 'move-node-to-workspace --focus-follows-window c'
 
-# Workspace switching
+# Workspace switching; existing previous/next navigation stays unchanged.
 alt-cmd-z = 'workspace prev'
 alt-cmd-x = 'workspace next'
+alt-cmd-w = 'workspace W̲eb'
+alt-cmd-n = 'workspace N̲ote'
+alt-cmd-c = 'workspace C̲omm'
+alt-cmd-a = 'workspace A̲I'
+alt-cmd-d = 'workspace D̲ev'
+alt-cmd-r = 'workspace R̲ead'
+alt-cmd-m = 'workspace M̲us'
 alt-cmd-1 = 'workspace 1'
 alt-cmd-2 = 'workspace 2'
-alt-cmd-3 = 'workspace 3'
-alt-cmd-4 = 'workspace 4'
-alt-cmd-5 = 'workspace 5'
-alt-cmd-6 = 'workspace 6'
-alt-cmd-7 = 'workspace 7'
-alt-cmd-8 = 'workspace 8'
-alt-cmd-9 = 'workspace 9'
-alt-cmd-a = 'workspace a'
-alt-cmd-b = 'workspace b'
-alt-cmd-c = 'workspace c'
 
 # Summon workspaces
+alt-cmd-shift-w = 'summon-workspace W̲eb'
+alt-cmd-shift-n = 'summon-workspace N̲ote'
+alt-cmd-shift-c = 'summon-workspace C̲omm'
+alt-cmd-shift-a = 'summon-workspace A̲I'
+alt-cmd-shift-d = 'summon-workspace D̲ev'
+alt-cmd-shift-r = 'summon-workspace R̲ead'
+alt-cmd-shift-m = 'summon-workspace M̲us'
 alt-cmd-shift-1 = 'summon-workspace 1'
 alt-cmd-shift-2 = 'summon-workspace 2'
-alt-cmd-shift-3 = 'summon-workspace 3'
-alt-cmd-shift-4 = 'summon-workspace 4'
-alt-cmd-shift-5 = 'summon-workspace 5'
 
 # Resize and balance
 ctrl-alt-minus = 'resize smart -50'
@@ -190,7 +219,7 @@ ctrl-alt-e = 'balance-sizes'
 
 # Layout maintenance
 alt-r = 'flatten-workspace-tree'
-alt-shift-r = 'reload-config'
+ctrl-alt-r = 'reload-config'
 alt-x = 'layout horizontal'
 alt-y = 'layout vertical'
 
@@ -209,3 +238,5 @@ alt-shift-f = 'macos-native-fullscreen'
 # Miscellaneous workspace controls
 alt-comma = 'layout tiles accordion'
 alt-tab = 'workspace-back-and-forth'
+# Move the current workspace to the next display, wrapping after the last display.
+alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'

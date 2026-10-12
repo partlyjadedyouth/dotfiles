@@ -7,9 +7,12 @@ local spaces = {}
 local space_brackets = {}
 local space_paddings = {}
 local workspace_order = {}
+local workspace_gap = 5
 local refresh_running = false
 local refresh_queued = false
 local queued_focused_workspace = nil
+local focused_workspace = nil
+local workspace_monitors = {}
 
 local function trim(value)
   if value == nil then
@@ -30,46 +33,46 @@ local function workspace_key(workspace)
   return table.concat(bytes)
 end
 
-local function reorder_aux_items(with_retry)
-  local move_commands = {}
+local function workspace_less(left, right)
+  -- Ignore shortcut underlines when comparing display names.
+  local left_name = left:gsub("̲", ""):lower()
+  local right_name = right:gsub("̲", ""):lower()
+  local left_number = left_name:match("^%d+$") and tonumber(left_name)
+  local right_number = right_name:match("^%d+$") and tonumber(right_name)
+
+  if left_number and right_number then
+    if left_number ~= right_number then
+      return left_number < right_number
+    end
+  elseif left_number then
+    return false
+  elseif right_number then
+    return true
+  elseif left_name ~= right_name then
+    return left_name < right_name
+  end
+
+  return left < right
+end
+
+local function reorder_aux_items(callback)
+  local moves = {}
   local anchor_name = "apple.logo"
 
   for _, workspace in ipairs(workspace_order) do
-    local space = spaces[workspace]
-    local padding = space_paddings[workspace]
-
-    if space ~= nil then
-      move_commands[#move_commands + 1] = "sketchybar --move "
-        .. shell_escape(space.name)
-        .. " after "
-        .. shell_escape(anchor_name)
-        .. " >/dev/null 2>&1"
-      anchor_name = space.name
-    end
-
-    if padding ~= nil then
-      move_commands[#move_commands + 1] = "sketchybar --move "
-        .. shell_escape(padding.name)
-        .. " after "
-        .. shell_escape(anchor_name)
-        .. " >/dev/null 2>&1"
-      anchor_name = padding.name
+    for _, item in ipairs({ spaces[workspace], space_paddings[workspace] }) do
+      moves[#moves + 1] = "--move " .. shell_escape(item.name)
+        .. " after " .. shell_escape(anchor_name)
+      anchor_name = item.name
     end
   end
 
-  move_commands[#move_commands + 1] = "sketchybar --query spaces.indicator >/dev/null 2>&1"
-    .. " && sketchybar --move spaces.indicator after "
-    .. shell_escape(anchor_name)
-    .. " >/dev/null 2>&1"
-
-  move_commands[#move_commands + 1] = "sketchybar --query front_app >/dev/null 2>&1"
-    .. " && sketchybar --move front_app after 'spaces.indicator' >/dev/null 2>&1"
-
-  local command = table.concat(move_commands, "; ")
-  sbar.exec(command)
-
-  if with_retry then
-    sbar.exec("sleep 0.05; " .. command)
+  -- Move the entire sorted row in one request before revealing newly added items.
+  -- Inserting after apple.logo keeps every workspace before spaces.indicator.
+  if #moves > 0 then
+    sbar.exec("sketchybar " .. table.concat(moves, " ") .. " >/dev/null 2>&1", callback)
+  elseif callback then
+    callback()
   end
 end
 
@@ -89,7 +92,7 @@ end
 
 local function build_icon_line(apps)
   if apps == nil or #apps == 0 then
-    return " —"
+    return ""
   end
 
   local icon_line = ""
@@ -101,11 +104,12 @@ local function build_icon_line(apps)
   return icon_line
 end
 
-local function set_focused_space(focused_workspace)
-  local focused = trim(focused_workspace)
+local function set_focused_space(workspace)
+  local focused = trim(workspace)
   if focused == "" then
     return
   end
+  focused_workspace = focused
 
   for _, workspace in ipairs(workspace_order) do
     local selected = workspace == focused
@@ -124,15 +128,17 @@ local function set_focused_space(focused_workspace)
   end
 end
 
-local function update_focused_space(focused_workspace)
-  local focused = trim(focused_workspace)
+local function update_focused_space(workspace, callback)
+  local focused = trim(workspace)
   if focused ~= "" then
     set_focused_space(focused)
+    if callback then callback() end
     return
   end
 
   sbar.exec("aerospace list-workspaces --focused 2>/dev/null | head -n 1", function(result)
     set_focused_space(result)
+    if callback then callback() end
   end)
 end
 
@@ -158,16 +164,19 @@ local function create_space(workspace)
   local bracket_name = "space.bracket." .. key
 
   local space = sbar.add("item", space_name, {
+    drawing = false,
     icon = {
-      font = { family = settings.font.numbers },
+      font = { family = settings.font.numbers, size = 12.0 },
       string = workspace,
-      padding_left = 15,
+      padding_left = 8,
       padding_right = 8,
       color = colors.white,
       highlight_color = colors.red,
     },
     label = {
-      padding_right = 20,
+      drawing = false,
+      padding_left = 0,
+      padding_right = 8,
       color = colors.grey,
       highlight_color = colors.white,
       font = "sketchybar-app-font:Regular:16.0",
@@ -184,6 +193,7 @@ local function create_space(workspace)
   })
 
   local space_bracket = sbar.add("bracket", bracket_name, { space.name }, {
+    drawing = false,
     background = {
       color = colors.transparent,
       border_color = colors.bg2,
@@ -193,8 +203,9 @@ local function create_space(workspace)
   })
 
   local space_padding = sbar.add("item", padding_name, {
+    drawing = false,
     script = "",
-    width = settings.group_paddings,
+    width = workspace_gap,
   })
 
   spaces[workspace] = space
@@ -239,6 +250,9 @@ local function sync_workspaces(callback)
       end
     end
 
+    table.sort(ordered, workspace_less)
+    workspace_monitors = monitor_by_workspace
+
     for workspace, _ in pairs(spaces) do
       if not seen[workspace] then
         remove_space(workspace)
@@ -265,12 +279,82 @@ local function sync_workspaces(callback)
     end
     workspace_order = ordered
     if structure_changed then
-      reorder_aux_items(true)
-    end
-
-    if callback ~= nil then
+      reorder_aux_items(callback)
+    elseif callback then
       callback()
     end
+  end)
+end
+
+local function fit_workspaces(apps_by_space, callback)
+  sbar.exec("sketchybar --query front_app", function(front_app)
+    -- The existing menu toggle hides front_app together with the workspace row.
+    if type(front_app) == "table" and front_app.geometry
+      and front_app.geometry.drawing == "off"
+    then
+      if callback then callback() end
+      return
+    end
+    -- Start with every name visible. Only empty, unfocused spaces may be hidden.
+    for _, workspace in ipairs(workspace_order) do
+      spaces[workspace]:set({ drawing = true })
+      space_brackets[workspace]:set({ drawing = true })
+      space_paddings[workspace]:set({ drawing = true })
+    end
+
+    sbar.exec("aerospace list-monitors --format '%{monitor-appkit-nsscreen-screens-id} %{monitor-name}'", function(monitors)
+      local built_in = {}
+      for line in tostring(monitors):gmatch("[^\r\n]+") do
+        local id, name = line:match("^(%d+)%s+(.+)$")
+        if name and name:lower():find("built%-in") then
+          built_in[id] = true
+        end
+      end
+
+      sbar.exec("sketchybar --query displays", function(displays)
+        if type(displays) == "table" then
+          for _, display in ipairs(displays) do
+            local id = tostring(display["arrangement-id"])
+            if built_in[id] then
+              local rect_key = "display-" .. id
+              local widths = {}
+              local total, start = 0, nil
+              for _, workspace in ipairs(workspace_order) do
+                if workspace_monitors[workspace] == id then
+                  local info = spaces[workspace]:query()
+                  local rect = info.bounding_rects and info.bounding_rects[rect_key]
+                  if rect then
+                    local width = rect.size[1] + workspace_gap
+                      + info.geometry.padding_left + info.geometry.padding_right
+                    widths[workspace] = width
+                    total = total + width
+                    start = math.min(start or rect.origin[1], rect.origin[1])
+                  end
+                end
+              end
+              local front_rect = type(front_app) == "table" and front_app.bounding_rects
+                and front_app.bounding_rects[rect_key]
+              -- Reserve the notch's default 200-point width, the spaces toggle,
+              -- the current app name, and a small safety margin.
+              local available = (display.frame.w - 200) / 2 - (start or 0)
+                - 40 - (front_rect and front_rect.size[1] or 0)
+              for i = #workspace_order, 1, -1 do
+                local workspace = workspace_order[i]
+                if total > available and widths[workspace]
+                  and workspace ~= focused_workspace and #apps_by_space[workspace] == 0
+                then
+                  spaces[workspace]:set({ drawing = false })
+                  space_brackets[workspace]:set({ drawing = false })
+                  space_paddings[workspace]:set({ drawing = false })
+                  total = total - widths[workspace]
+                end
+              end
+            end
+          end
+        end
+        if callback then callback() end
+      end)
+    end)
   end)
 end
 
@@ -294,36 +378,36 @@ local function update_windows_on_spaces(callback)
       end
     end
 
-    sbar.animate("tanh", 10, function()
-      for _, workspace in ipairs(workspace_order) do
-        local space = spaces[workspace]
-        if space ~= nil then
-          space:set({ label = build_icon_line(apps_by_space[workspace]) })
-        end
+    for _, workspace in ipairs(workspace_order) do
+      local space = spaces[workspace]
+      if space ~= nil then
+        space:set({ label = {
+          string = build_icon_line(apps_by_space[workspace]),
+          drawing = #apps_by_space[workspace] > 0,
+        } })
       end
-    end)
-
-    if callback ~= nil then
-      callback()
     end
+
+    fit_workspaces(apps_by_space, callback)
   end)
 end
 
 local function run_refresh(focused_workspace)
   refresh_running = true
   sync_workspaces(function()
-    update_focused_space(focused_workspace)
-    update_windows_on_spaces(function()
-      refresh_running = false
+    update_focused_space(focused_workspace, function()
+      update_windows_on_spaces(function()
+        refresh_running = false
 
-      if refresh_queued then
-        local queued = queued_focused_workspace
-        refresh_queued = false
-        queued_focused_workspace = nil
-        sbar.exec("true", function()
-          run_refresh(queued)
-        end)
-      end
+        if refresh_queued then
+          local queued = queued_focused_workspace
+          refresh_queued = false
+          queued_focused_workspace = nil
+          sbar.exec("true", function()
+            run_refresh(queued)
+          end)
+        end
+      end)
     end)
   end)
 end
@@ -403,6 +487,14 @@ space_window_observer:subscribe("window_focus", function(env)
 end)
 
 space_window_observer:subscribe("routine", function(env)
+  refresh_spaces()
+end)
+
+space_window_observer:subscribe("display_change", function(env)
+  refresh_spaces()
+end)
+
+space_window_observer:subscribe("swap_menus_and_spaces", function(env)
   refresh_spaces()
 end)
 
