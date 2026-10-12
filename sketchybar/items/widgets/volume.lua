@@ -1,6 +1,8 @@
+local sbar = require("sketchybar")
 local colors = require("colors")
 local icons = require("icons")
 local settings = require("settings")
+local strings = require("helpers.strings")
 
 local popup_width = 250
 
@@ -98,7 +100,6 @@ local function volume_collapse_details()
   sbar.remove('/volume.device\\.*/')
 end
 
-local current_audio_device = "None"
 local function volume_toggle_details(env)
   if env.BUTTON == "right" then
     sbar.exec("open /System/Library/PreferencePanes/Sound.prefpane")
@@ -109,15 +110,13 @@ local function volume_toggle_details(env)
   if should_draw then
     volume_bracket:set({ popup = { drawing = true } })
     sbar.exec("SwitchAudioSource -t output -c", function(result)
-      current_audio_device = result:sub(1, -2)
+      local current_audio_device = result:gsub("[\r\n]+$", "")
       sbar.exec("SwitchAudioSource -a -t output", function(available)
-        current = current_audio_device
-        local color = colors.grey
         local counter = 0
 
         for device in string.gmatch(available, '[^\r\n]+') do
           local color = colors.grey
-          if current == device then
+          if current_audio_device == device then
             color = colors.white
           end
           sbar.add("item", "volume.device." .. counter, {
@@ -125,7 +124,7 @@ local function volume_toggle_details(env)
             width = popup_width,
             align = "center",
             label = { string = device, color = color },
-            click_script = 'SwitchAudioSource -s "' .. device .. '" && sketchybar --set /volume.device\\.*/ label.color=' .. colors.grey .. ' --set $NAME label.color=' .. colors.white
+            click_script = 'SwitchAudioSource -s ' .. strings.shell_escape(device) .. ' && sketchybar --set /volume.device\\.*/ label.color=' .. colors.grey .. ' --set $NAME label.color=' .. colors.white
 
           })
           counter = counter + 1

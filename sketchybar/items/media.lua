@@ -1,3 +1,4 @@
+local sbar = require("sketchybar")
 local icons = require("icons")
 local colors = require("colors")
 
@@ -53,24 +54,20 @@ local media_title = sbar.add("item", {
   },
 })
 
-sbar.add("item", {
-  position = "popup." .. media_cover.name,
-  icon = { string = icons.media.back },
-  label = { drawing = false },
-  click_script = "nowplaying-cli previous",
-})
-sbar.add("item", {
-  position = "popup." .. media_cover.name,
-  icon = { string = icons.media.play_pause },
-  label = { drawing = false },
-  click_script = "nowplaying-cli togglePlayPause",
-})
-sbar.add("item", {
-  position = "popup." .. media_cover.name,
-  icon = { string = icons.media.forward },
-  label = { drawing = false },
-  click_script = "nowplaying-cli next",
-})
+local controls = {
+  { icon = icons.media.back, command = "previous" },
+  { icon = icons.media.play_pause, command = "togglePlayPause" },
+  { icon = icons.media.forward, command = "next" },
+}
+
+for _, control in ipairs(controls) do
+  sbar.add("item", {
+    position = "popup." .. media_cover.name,
+    icon = { string = control.icon },
+    label = { drawing = false },
+    click_script = "nowplaying-cli " .. control.command,
+  })
+end
 
 local interrupt = 0
 local function animate_detail(detail)

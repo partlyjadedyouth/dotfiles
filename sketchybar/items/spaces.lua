@@ -1,7 +1,11 @@
+local sbar = require("sketchybar")
 local colors = require("colors")
 local icons = require("icons")
 local settings = require("settings")
-local app_icons = require("helpers.app_icons")
+local workspaces = require("helpers.workspaces")
+local strings = require("helpers.strings")
+local trim = strings.trim
+local shell_escape = strings.shell_escape
 
 local spaces = {}
 local space_brackets = {}
@@ -14,45 +18,11 @@ local queued_focused_workspace = nil
 local focused_workspace = nil
 local workspace_monitors = {}
 
-local function trim(value)
-  if value == nil then
-    return ""
+local function set_workspace_items(workspace, properties)
+  for _, collection in ipairs({ spaces, space_brackets, space_paddings }) do
+    local item = collection[workspace]
+    if item then item:set(properties) end
   end
-  return (value:gsub("^%s+", ""):gsub("%s+$", ""))
-end
-
-local function shell_escape(value)
-  return "'" .. value:gsub("'", [["'"']]) .. "'"
-end
-
-local function workspace_key(workspace)
-  local bytes = {}
-  for i = 1, #workspace, 1 do
-    bytes[#bytes + 1] = string.format("%02x", workspace:byte(i))
-  end
-  return table.concat(bytes)
-end
-
-local function workspace_less(left, right)
-  -- Ignore shortcut underlines when comparing display names.
-  local left_name = left:gsub("̲", ""):lower()
-  local right_name = right:gsub("̲", ""):lower()
-  local left_number = left_name:match("^%d+$") and tonumber(left_name)
-  local right_number = right_name:match("^%d+$") and tonumber(right_name)
-
-  if left_number and right_number then
-    if left_number ~= right_number then
-      return left_number < right_number
-    end
-  elseif left_number then
-    return false
-  elseif right_number then
-    return true
-  elseif left_name ~= right_name then
-    return left_name < right_name
-  end
-
-  return left < right
 end
 
 local function reorder_aux_items(callback)
@@ -67,41 +37,13 @@ local function reorder_aux_items(callback)
     end
   end
 
-  -- Move the entire sorted row in one request before revealing newly added items.
+  -- Move the entire workspace row in one request before revealing newly added items.
   -- Inserting after apple.logo keeps every workspace before spaces.indicator.
   if #moves > 0 then
     sbar.exec("sketchybar " .. table.concat(moves, " ") .. " >/dev/null 2>&1", callback)
   elseif callback then
     callback()
   end
-end
-
-local function same_workspace_order(left, right)
-  if #left ~= #right then
-    return false
-  end
-
-  for i = 1, #left, 1 do
-    if left[i] ~= right[i] then
-      return false
-    end
-  end
-
-  return true
-end
-
-local function build_icon_line(apps)
-  if apps == nil or #apps == 0 then
-    return ""
-  end
-
-  local icon_line = ""
-  for _, app in ipairs(apps) do
-    local lookup = app_icons[app]
-    local icon = (lookup == nil) and app_icons["Default"] or lookup
-    icon_line = icon_line .. icon
-  end
-  return icon_line
 end
 
 local function set_focused_space(workspace)
@@ -158,7 +100,7 @@ local function remove_space(workspace)
 end
 
 local function create_space(workspace)
-  local key = workspace_key(workspace)
+  local key = workspaces.key(workspace)
   local space_name = "space." .. key
   local padding_name = "space.padding." .. key
   local bracket_name = "space.bracket." .. key
@@ -232,25 +174,9 @@ end
 
 local function sync_workspaces(callback)
   sbar.exec("aerospace list-workspaces --all --format '%{workspace}\t%{monitor-appkit-nsscreen-screens-id}' 2>/dev/null", function(result)
-    local seen = {}
-    local ordered = {}
-    local monitor_by_workspace = {}
+    local ordered, seen, monitor_by_workspace = workspaces.parse_workspaces(result)
     local structure_changed = false
 
-    for line in string.gmatch(result, "[^\r\n]+") do
-      local workspace, monitor = line:match("^([^\t]+)\t(.+)$")
-      workspace = trim(workspace)
-      monitor = trim(monitor)
-      if workspace ~= "" then
-        if not seen[workspace] then
-          seen[workspace] = true
-          ordered[#ordered + 1] = workspace
-        end
-        monitor_by_workspace[workspace] = monitor
-      end
-    end
-
-    table.sort(ordered, workspace_less)
     workspace_monitors = monitor_by_workspace
 
     for workspace, _ in pairs(spaces) do
@@ -268,13 +194,11 @@ local function sync_workspaces(callback)
 
       local monitor = monitor_by_workspace[workspace]
       if monitor ~= nil and monitor ~= "" then
-        spaces[workspace]:set({ display = monitor })
-        space_brackets[workspace]:set({ display = monitor })
-        space_paddings[workspace]:set({ display = monitor })
+        set_workspace_items(workspace, { display = monitor })
       end
     end
 
-    if not same_workspace_order(workspace_order, ordered) then
+    if not workspaces.same_order(workspace_order, ordered) then
       structure_changed = true
     end
     workspace_order = ordered
@@ -297,9 +221,7 @@ local function fit_workspaces(apps_by_space, callback)
     end
     -- Start with every name visible. Only empty, unfocused spaces may be hidden.
     for _, workspace in ipairs(workspace_order) do
-      spaces[workspace]:set({ drawing = true })
-      space_brackets[workspace]:set({ drawing = true })
-      space_paddings[workspace]:set({ drawing = true })
+      set_workspace_items(workspace, { drawing = true })
     end
 
     sbar.exec("aerospace list-monitors --format '%{monitor-appkit-nsscreen-screens-id} %{monitor-name}'", function(monitors)
@@ -343,9 +265,7 @@ local function fit_workspaces(apps_by_space, callback)
                 if total > available and widths[workspace]
                   and workspace ~= focused_workspace and #apps_by_space[workspace] == 0
                 then
-                  spaces[workspace]:set({ drawing = false })
-                  space_brackets[workspace]:set({ drawing = false })
-                  space_paddings[workspace]:set({ drawing = false })
+                  set_workspace_items(workspace, { drawing = false })
                   total = total - widths[workspace]
                 end
               end
@@ -360,29 +280,13 @@ end
 
 local function update_windows_on_spaces(callback)
   sbar.exec("aerospace list-windows --all --format '%{workspace}\t%{app-name}' 2>/dev/null", function(result)
-    local apps_by_space = {}
-    local seen_by_space = {}
-
-    for workspace, _ in pairs(spaces) do
-      apps_by_space[workspace] = {}
-      seen_by_space[workspace] = {}
-    end
-
-    for line in string.gmatch(result, "[^\r\n]+") do
-      local workspace, app = line:match("^([^\t]+)\t(.+)$")
-      workspace = trim(workspace)
-      app = trim(app)
-      if apps_by_space[workspace] ~= nil and app ~= "" and not seen_by_space[workspace][app] then
-        table.insert(apps_by_space[workspace], app)
-        seen_by_space[workspace][app] = true
-      end
-    end
+    local apps_by_space = workspaces.parse_windows(result, spaces)
 
     for _, workspace in ipairs(workspace_order) do
       local space = spaces[workspace]
       if space ~= nil then
         space:set({ label = {
-          string = build_icon_line(apps_by_space[workspace]),
+          string = workspaces.icon_line(apps_by_space[workspace]),
           drawing = #apps_by_space[workspace] > 0,
         } })
       end
@@ -433,11 +337,6 @@ sbar.add("event", "aerospace_workspace_change")
 sbar.add("event", "windows_on_spaces")
 sbar.add("event", "window_focus")
 
-local space_focus_observer = sbar.add("item", {
-  drawing = false,
-  updates = true,
-})
-
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
@@ -466,35 +365,18 @@ local spaces_indicator = sbar.add("item", "spaces.indicator", {
   }
 })
 
-space_focus_observer:subscribe("aerospace_workspace_change", function(env)
-  refresh_spaces(env and env.FOCUSED or nil)
-end)
-
 space_window_observer:subscribe("aerospace_workspace_change", function(env)
   refresh_spaces(env and env.FOCUSED or nil)
 end)
 
-space_window_observer:subscribe("windows_on_spaces", function(env)
-  refresh_spaces()
-end)
-
-space_window_observer:subscribe("front_app_switched", function(env)
-  refresh_spaces()
-end)
-
-space_window_observer:subscribe("window_focus", function(env)
-  refresh_spaces()
-end)
-
-space_window_observer:subscribe("routine", function(env)
-  refresh_spaces()
-end)
-
-space_window_observer:subscribe("display_change", function(env)
-  refresh_spaces()
-end)
-
-space_window_observer:subscribe("swap_menus_and_spaces", function(env)
+space_window_observer:subscribe({
+  "windows_on_spaces",
+  "front_app_switched",
+  "window_focus",
+  "routine",
+  "display_change",
+  "swap_menus_and_spaces",
+}, function()
   refresh_spaces()
 end)
 
