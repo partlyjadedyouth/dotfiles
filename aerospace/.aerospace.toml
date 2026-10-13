@@ -57,7 +57,7 @@ check-further-callbacks = true
 run = 'move-node-to-workspace --focus-follows-window W̲eb'
 
 [[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id)$"'
+if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id|com[.]apple[.]Notes)$"'
 check-further-callbacks = true
 run = 'move-node-to-workspace --focus-follows-window Note̲'
 
@@ -77,7 +77,7 @@ check-further-callbacks = true
 run = 'move-node-to-workspace --focus-follows-window D̲ev'
 
 [[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]apple[.]Preview)$"'
+if = 'test %{app-bundle-id} ~= "^(com[.]apple[.]Preview|org[.]zotero[.]zotero)$"'
 check-further-callbacks = true
 run = 'move-node-to-workspace --focus-follows-window R̲ead'
 
@@ -88,7 +88,7 @@ run = 'move-node-to-workspace --focus-follows-window M̲usic'
 
 # Unassigned apps default to Z1; workspace Z2 is available for manual grouping.
 [[on-window-detected]]
-if = 'test-not %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia|md[.]obsidian|notion[.]id|com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal|com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop|com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty|com[.]apple[.]Preview|com[.]spotify[.]client)$"'
+if = 'test-not %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia|md[.]obsidian|notion[.]id|com[.]apple[.]Notes|com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal|com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop|com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty|com[.]apple[.]Preview|com[.]spotify[.]client|org[.]zotero[.]zotero))$"'
 check-further-callbacks = true
 run = 'move-node-to-workspace --focus-follows-window Z1'
 
