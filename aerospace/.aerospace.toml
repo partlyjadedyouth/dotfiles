@@ -49,111 +49,125 @@ outer.right = 4
 check-further-callbacks = true
 run = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger windows_on_spaces'
 
-# Route newly detected windows only: manual moves persist until a new window opens.
-# Continue into the original floating rules below without changing their layouts.
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window W̲eb'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id|com[.]apple[.]Notes)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window Note̲'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window C̲omm'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window A̲I'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window D̲ev'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]apple[.]Preview|org[.]zotero[.]zotero)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window R̲ead'
-
-[[on-window-detected]]
-if = 'test %{app-bundle-id} ~= "^(com[.]spotify[.]client)$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window M̲usic'
-
-# Unassigned apps default to Z1; workspace Z2 is available for manual grouping.
-[[on-window-detected]]
-if = 'test-not %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia|md[.]obsidian|notion[.]id|com[.]apple[.]Notes|com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal|com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop|com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty|com[.]apple[.]Preview|com[.]spotify[.]client|org[.]zotero[.]zotero))$"'
-check-further-callbacks = true
-run = 'move-node-to-workspace --focus-follows-window Z1'
-
+# Apply floating layouts before choosing a workspace.
 [[on-window-detected]]
 if.app-name-regex-substring = 'System Settings'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Finder'
 if.window-title-regex-substring = 'Co(py|nnect)|Move|Info|Pref'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Safari'
 if.window-title-regex-substring = '^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'App Store'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Activity Monitor'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Calculator'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Dictionary'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.window-title-regex-substring = '^Software Update$'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'System Information'
 if.window-title-regex-substring = '^About This Mac$'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'com.kakao.KakaoTalkMac'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Keka'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'AppCleaner'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Photo Booth'
+check-further-callbacks = true
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'FaceTime'
+check-further-callbacks = true
 run = 'layout floating'
+
+# Route newly detected windows only: manual moves persist until a new window opens.
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(company[.]thebrowser[.]dia)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window W̲eb'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(md[.]obsidian|notion[.]id|com[.]apple[.]Notes)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window Note̲'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]tinyspeck[.]slackmacgap|com[.]kakao[.]KakaoTalkMac|com[.]apple[.]iCal)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window C̲omm'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]openai[.]chat|com[.]openai[.]codex|com[.]anthropic[.]claudefordesktop)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window A̲I'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]microsoft[.]VSCode|com[.]mitchellh[.]ghostty)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window D̲ev'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]apple[.]Preview|org[.]zotero[.]zotero)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window R̲ead'
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} ~= "^(com[.]spotify[.]client)$"'
+check-further-callbacks = false
+run = 'move-node-to-workspace --focus-follows-window M̲usic'
+
+# Unassigned apps default to Z1; workspace Z2 is available for manual grouping.
+[[on-window-detected]]
+if = 'true'
+run = 'move-node-to-workspace --focus-follows-window Z1'
 
 # Main key bindings
 [mode.main.binding]
@@ -238,5 +252,6 @@ alt-shift-f = 'macos-native-fullscreen'
 # Miscellaneous workspace controls
 alt-comma = 'layout tiles accordion'
 alt-tab = 'workspace-back-and-forth'
+
 # Move the current workspace to the next display, wrapping after the last display.
-alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+cmd-shift-tab = 'move-workspace-to-monitor --wrap-around next'
